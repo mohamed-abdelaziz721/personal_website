@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Blog — Mohamed Abdelaziz">
+  <h1 class="text-3xl font-bold mb-8">Blog</h1>
+  {posts.length === 0 ? (
+    <p class="text-gray-400">No posts yet — add an <code>.mdx</code> file to <code>src/content/blog/</code>.</p>
+  ) : (
+    <ul class="space-y-6">
+      {posts.map((post) => (
+        <li>
+          <a href={`/personal_website/blog/${post.id}`} class="block border border-gray-800 hover:border-blue-600 rounded-xl p-6 transition-colors">
+            <h2 class="text-xl font-semibold mb-1">{post.data.title}</h2>
+            <p class="text-gray-400 text-sm mb-2">{post.data.description}</p>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-gray-600">{post.data.date.toDateString()}</span>
+              {post.data.tags?.map((tag: string) => (
+                <span class="text-xs bg-gray-800 px-2 py-0.5 rounded">{tag}</span>
+              ))}
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

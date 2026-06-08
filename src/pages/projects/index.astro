@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+projects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Projects — Mohamed Abdelaziz">
+  <h1 class="text-3xl font-bold mb-8">Projects</h1>
+  {projects.length === 0 ? (
+    <p class="text-gray-400">No projects yet — add an <code>.mdx</code> file to <code>src/content/projects/</code>.</p>
+  ) : (
+    <ul class="space-y-6">
+      {projects.map((p) => (
+        <li>
+          <a href={`/personal_website/projects/${p.id}`} class="block border border-gray-800 hover:border-blue-600 rounded-xl p-6 transition-colors">
+            <h2 class="text-xl font-semibold mb-1">{p.data.title}</h2>
+            <p class="text-gray-400 text-sm mb-2">{p.data.description}</p>
+            <span class="text-xs text-gray-600">{p.data.date.toDateString()}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

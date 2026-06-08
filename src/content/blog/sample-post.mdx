@@ -1,0 +1,47 @@
+---
+title: "Sample: Math, Charts & 3D in MDX"
+description: "A demo showing KaTeX equations, Recharts, and VTK.js all embedded in a single blog post."
+date: 2026-06-08
+tags: ["demo", "medical-imaging", "visualization"]
+---
+
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+## Math equations
+
+Inline: the Fourier transform is $\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x)\, e^{-2\pi i x \xi}\, dx$
+
+Block:
+
+$$
+\nabla^2 \phi = \frac{1}{c^2} \frac{\partial^2 \phi}{\partial t^2}
+$$
+
+## Chart
+
+export const data = [
+  { name: 'Slice 1', HU: -1000 },
+  { name: 'Slice 2', HU: -300 },
+  { name: 'Slice 3', HU: 40 },
+  { name: 'Slice 4', HU: 400 },
+  { name: 'Slice 5', HU: 700 },
+];
+
+<ResponsiveContainer width="100%" height={250}>
+  <LineChart data={data}>
+    <XAxis dataKey="name" stroke="#9ca3af" />
+    <YAxis stroke="#9ca3af" />
+    <Tooltip />
+    <Line type="monotone" dataKey="HU" stroke="#3b82f6" strokeWidth={2} dot={false} />
+  </LineChart>
+</ResponsiveContainer>
+
+## 3D Viewer
+
+Import `VtkViewer` or `MprViewer` from `../../components/VtkViewer` and pass a URL or imageIds array.
+Use `client:only="react"` so the viewer loads only in the browser:
+
+```astro
+import VtkViewer from '../../components/VtkViewer';
+<VtkViewer client:only="react" url="/data/my-volume.vti" height={500} />
+```

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((p) => ({ params: { id: p.id }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${project.data.title} — Mohamed Abdelaziz`} description={project.data.description}>
+  <article class="prose prose-invert max-w-none">
+    <h1>{project.data.title}</h1>
+    <p class="text-gray-500 text-sm">{project.data.date.toDateString()}</p>
+    <Content />
+  </article>
+</BaseLayout>

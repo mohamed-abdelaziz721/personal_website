@@ -39,6 +39,9 @@ desktop.ini
 *.sln
 *.sw?
 
+# Astro
+.astro/
+
 # Misc
 *.log
 .cache/
