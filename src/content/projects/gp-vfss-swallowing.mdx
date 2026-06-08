@@ -1,0 +1,63 @@
+---
+title: "GP-VFSS Swallowing Analysis"
+description: "Automated swallowing analysis from videofluoroscopy (VFSS). Reproduces the clinical measurements speech-language pathologists perform manually — hyoid tracking, bolus segmentation, pharyngeal phase detection."
+date: 2024-03-01
+tags: ["Computer Vision", "Optical Flow", "PyQt5", "Fluoroscopy", "Clinical Tools"]
+client: "Toronto–Pittsburgh"
+---
+
+Clinical desktop system for automated swallowing analysis from videofluoroscopy (VFSS). Reproduces the measurements that speech-language pathologists perform manually — frame-by-frame, on every patient.
+
+## Pipeline
+
+```
+Fluoroscopy Video
+  └─ Motion Detection  ──→  Pharyngeal Phase Detection
+                                  ├─ Hyoid Bone Analysis  (displacement metric)
+                                  └─ Bolus Segmentation  (bolus tracking)
+                                       └─ Desktop Application  (clinical output)
+```
+
+## Pipeline Stages
+
+### Motion Detection
+Classifies each frame as swallow-active or resting using optical flow rather than raw pixel classification.
+
+- **TV-L1 variational optical flow** — L1-norm robustness handles the noise and contrast variation in fluoroscopy
+- **HSV motion encoding** — hue encodes direction, value encodes magnitude; turns motion field into an image
+- **Shallow CNN classifier** — trained on encoded flow images; small architecture generalises well on limited data
+- **Post-processing** — 5-frame discontinuity filter removes spurious single-frame predictions
+- **Result** — 97 % accuracy under strict patient-ID split (true generalisation, no data leakage)
+
+### Pharyngeal Phase Detection
+Temporally segments the pharyngeal swallowing phase from the full video, isolating the clinically relevant window for downstream measurements.
+
+### Hyoid Bone Analysis
+Tracks hyoid displacement — the primary clinical metric in VFSS assessment.
+
+- Template matching + optical flow refinement across frames
+- Displacement curve (mm) relative to anatomical landmarks
+- Exported as clinical measurement
+
+### Bolus Segmentation
+Delineates the contrast bolus across video frames to track transit timing and clearance.
+
+- Contrast-aware segmentation adapted for fluoroscopy intensity range
+- Frame-by-frame bolus mask generation
+- Residue and penetration flagging
+
+### Desktop Application
+PyQt5 application packaging the full pipeline for clinical use by speech-language pathologists — no engineering knowledge required.
+
+- Video loading, frame navigation, manual correction overlays
+- Automatic pipeline execution with progress feedback
+- Export: measurements CSV + annotated video
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| GUI | PyQt5 |
+| Vision | OpenCV, TV-L1 optical flow |
+| Deep Learning | PyTorch (CNN classifier) |
+| Tracking | Template matching + optical flow |

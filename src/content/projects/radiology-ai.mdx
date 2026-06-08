@@ -1,0 +1,60 @@
+---
+title: "Radiology AI"
+description: "Three containerized clinical AI modules sharing a common DICOM service architecture. DICOM-in / DICOM-out pipeline covering abdominal CT, brain hemorrhage, and PET/CT oncology."
+date: 2024-06-01
+tags: ["FastAPI", "DICOM", "Deep Learning", "ONNX", "TensorRT", "Docker", "Medical AI"]
+client: "Ramyro"
+---
+
+Containerized clinical AI platform — three independent modules, one shared DICOM architecture. Each module receives a DICOM study from PACS, runs AI inference, and returns Secondary Captures, DICOM Segmentations, and encapsulated PDF reports back to PACS.
+
+## Shared Architecture
+
+```
+DICOM Study (from PACS)
+  └─ Series Gating / Phase Classification
+       └─ AI Inference (ONNX or TensorRT backend)
+            └─ Post-processing + Quantification
+                 └─ DICOM SC + SEG + PDF → PACS
+```
+
+- **Dual inference backend** — ONNX Runtime (CPU/GPU) and TensorRT (NVIDIA), injected at startup
+- **`BYPASS_*` environment flags** — skip expensive steps during development
+- **Validated outputs** — quantitatively verified against 3D Slicer reference implementations
+- **Shared DICOM layer** — common utilities for DICOM reading, SC/SEG/PDF creation, C-STORE to PACS
+
+## Clinical AI Modules
+
+### OncoSight Abdomen
+Multiphase abdominal CT analysis covering liver, kidney, and pancreatic lesion detection plus hepatic steatosis screening.
+
+- Multiphase phase classification: NC / Arterial / Venous / Delayed — 4-pass cascade using DICOM tags, keyword matching, HU-based contrast scoring, and temporal ordering
+- Neck/shoulder rejection to isolate abdominal volume
+- Lesion detection with bounding-box and segmentation outputs
+- Hepatic steatosis HU scoring
+
+### CerebroSight
+Hemorrhagic stroke detection from non-contrast brain CT.
+
+- Automatic neck/shoulder slice rejection via structural bone-brain profile analysis
+- Hemorrhage detection and localization
+- Laterality classification
+- Urgency-flagged PDF report → PACS
+
+### PETSight
+FDG PET/CT full-body oncology analysis.
+
+- Lesion detection across whole-body PET volume
+- SUV (standardized uptake value) quantification per lesion
+- Structured oncology report with lesion inventory
+- DICOM Segmentation + encapsulated PDF → PACS
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| API | FastAPI, Docker |
+| Inference | ONNX Runtime, TensorRT |
+| DICOM | pydicom, high-dicom |
+| Deep Learning | PyTorch |
+| Reporting | ReportLab (PDF) |

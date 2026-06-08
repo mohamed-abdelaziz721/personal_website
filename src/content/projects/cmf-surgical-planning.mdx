@@ -1,0 +1,65 @@
+---
+title: "CMF Surgical Planning"
+description: "VTK + PyQt5 desktop platform covering the full pipeline from raw CT imaging to physical surgical guide manufacturing. 16 modules deployed via 3D Slicer."
+date: 2024-01-01
+tags: ["VTK", "PyQt5", "Deep Learning", "3D Slicer", "Mesh Processing", "Medical Imaging"]
+client: "MedSoft"
+---
+
+Full craniomaxillofacial surgical planning platform — from raw CT scan to 3D-printed surgical guide, running as scripted modules inside 3D Slicer.
+
+## Pipeline
+
+```
+CT Scan
+  └─ CT Auto Segmentation  ──→  Image Segmentation (mask → mesh)
+                                  └─ Mesh Processing (registration primitives)
+                                       ├─ Mesh Registration  ──→  Slicer Plugin
+                                       ├─ Anatomical Landmarking  ──→  Slicer Plugin
+                                       ├─ Mesh Osteotomy  ──→  Graft Planner
+                                       └─ Mesh Deformation  ──→  Slicer Plugin
+                                            └─ Shape Modeling (SSM / Orbital)
+                                                 └─ Physical Manufacturing
+```
+
+## Modules
+
+### Foundation
+- **CMF Tools SDK** — shared VTK + PyQt5 base, `MeshData` abstraction, abstract AI base classes
+- **Algorithm Framework** — generic grid search, batch evaluation, cross-validation harness
+
+### Deep Learning & AI
+- **CT Auto Segmentation** — 3D U-Net training + inference for teeth, pelvis, fibula, scapula. Physical-space SimpleITK augmentation; config-driven; AWS-scalable.
+- **AI Mesh Segmentation** — render-and-backproject pipeline: multi-view 2D predictions projected back onto 3D mesh faces
+- **Mesh Segmentation** — MeshSegNet graph convolution directly on mesh face features
+- **Image Segmentation** — mask-to-mesh pipeline with level-set refinement and shape reconstruction
+
+### Mesh Processing & Geometry
+- **Mesh Processing** — FPFH + RANSAC + ICP registration primitives, volume computation, spline fitting
+- **Mesh Deformation** — soft tissue simulation, ARAP (as-rigid-as-possible), FFD, airway simulation
+- **Mesh Osteotomy** — Le Fort I, BSSO, and generic parametric osteotomy cut surfaces
+- **Anatomical Landmarking** — pelvic landmark detection via template registration + curvature refinement
+
+### Registration & Alignment
+- **Mesh Registration** — four-stage dental arch registration: coarse landmarks → RANSAC → ICP → dental-specific refinement
+
+### Shape Modeling
+- **Statistical Shape Model** — population SSM for cranium reconstruction (Procrustes alignment + PCA)
+- **Orbital Shape Modeling** — bilateral mirroring, TPS warping, harmonic deformation for orbital floor implants
+
+### Clinical Tools
+- **Graft Planner** — fibula free flap mandible reconstruction planning
+- **Fast GrowCut** — interactive trauma fragment segmentation via cellular automaton seeding
+
+### Clinical Deployment
+- **Slicer Plugins** — 9 algorithms packaged as 3D Slicer scripted modules with Segment Editor integration
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| GUI | PyQt5, VTK |
+| Deep Learning | TensorFlow / Keras, ONNX |
+| Geometry | VTK, Open3D, SimpleITK |
+| Deployment | 3D Slicer scripted modules |
+| Cloud training | AWS |

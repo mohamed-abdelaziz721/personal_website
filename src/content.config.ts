@@ -19,6 +19,7 @@ const projects = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).optional(),
     github: z.string().url().optional(),
+    client: z.string().optional(),
   }),
 });
 
