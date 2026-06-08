@@ -8,18 +8,59 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+
+const base    = import.meta.env.BASE_URL.replace(/\/$/, '');
+const dateStr = post.data.date.toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
 ---
 
-<BaseLayout title={`${post.data.title} — Mohamed Abdelaziz`} description={post.data.description}>
-  <article class="prose prose-invert max-w-none">
-    <h1>{post.data.title}</h1>
-    <div class="flex gap-3 items-center mb-8">
-      <span class="text-gray-500 text-sm">{post.data.date.toDateString()}</span>
-      {post.data.tags?.map((tag: string) => (
-        <span class="text-xs bg-gray-800 px-2 py-0.5 rounded">{tag}</span>
+<BaseLayout
+  title={`${post.data.title} — Mohamed Abdelaziz`}
+  description={post.data.description}
+  headings={headings}
+>
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-xs text-gray-600 mb-8">
+    <a href={`${base}/`}       class="hover:text-gray-400 transition-colors cursor-pointer">Home</a>
+    <span>/</span>
+    <a href={`${base}/blog`}   class="hover:text-gray-400 transition-colors cursor-pointer">Blog</a>
+    <span>/</span>
+    <span class="text-gray-400 truncate">{post.data.title}</span>
+  </nav>
+
+  <!-- Post header -->
+  <header class="mb-10 pb-8 border-b border-white/[0.07]">
+    <div class="flex items-center gap-3 mb-4 flex-wrap">
+      <time class="text-xs text-gray-600 font-mono">{dateStr}</time>
+      {post.data.tags && post.data.tags.length > 0 && post.data.tags.map((tag: string) => (
+        <span class="text-[11px] px-2 py-0.5 rounded-md bg-white/[0.05] text-gray-500 border border-white/[0.08]">
+          {tag}
+        </span>
       ))}
     </div>
+    <h1 class="text-3xl font-bold text-white mb-3 leading-tight">
+      {post.data.title}
+    </h1>
+    <p class="text-gray-400 text-base leading-relaxed max-w-2xl">
+      {post.data.description}
+    </p>
+  </header>
+
+  <!-- MDX body -->
+  <article class="prose prose-lg max-w-none">
     <Content />
   </article>
+
+  <!-- Footer nav -->
+  <div class="mt-16 pt-6 border-t border-white/[0.07]">
+    <a href={`${base}/blog`}
+       class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+      </svg>
+      All posts
+    </a>
+  </div>
 </BaseLayout>
