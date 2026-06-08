@@ -10,6 +10,12 @@ npm run build     # production build → dist/
 npm run preview   # serve the dist/ folder locally
 ```
 
+When installing new packages, always use `--legacy-peer-deps`:
+```bash
+npm install <package> --legacy-peer-deps
+```
+`@cornerstonejs/tools` requires `@kitware/vtk.js@34.x` exactly, but we run `vtk.js@36.x`. The two libraries load independently at runtime so the version mismatch is harmless, but npm's peer dep check must be bypassed.
+
 No test runner or linter is configured yet.
 
 ## Architecture
