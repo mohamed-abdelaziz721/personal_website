@@ -9,15 +9,22 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
   site: 'https://mohamed-abdelaziz721.github.io',
   base: '/personal_website',
-  markdown: {
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
-  },
-  integrations: [react(), mdx()],
+  integrations: [
+    react(),
+    mdx({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex],
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
-      exclude: ['@kitware/vtk.js'],
+      exclude: [
+        '@kitware/vtk.js',
+        '@cornerstonejs/core',
+        '@cornerstonejs/tools',
+        '@cornerstonejs/dicom-image-loader',
+      ],
     },
   },
 });
